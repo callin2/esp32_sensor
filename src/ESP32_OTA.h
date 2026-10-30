@@ -229,6 +229,26 @@ void print(unsigned long i) {
     }
 }
 
+void print( float i) {
+    if(oledEnabled) {
+        if(numLines >= 8) {
+            display.clearDisplay();
+            display.setCursor(0,0);
+            numLines = 0;
+        }
+
+        display.print(i);
+        display.display();
+    }else {
+        Serial.print(i);
+    }
+
+    if(TelnetStream.available()) {
+        TelnetStream.print(i);
+    }
+}
+
+
 void println(void) {
     print("\n");
     if(TelnetStream.available()) {
