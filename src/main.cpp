@@ -4,6 +4,9 @@
 #include "ESP32_OTA.h"
 #include "luainc.h"
 
+#include <CheapStepper.h>
+
+
 static lua_State *L = luaL_newstate();
 const char* errmsg = NULL;
 
@@ -15,6 +18,11 @@ const char* errmsg = NULL;
 Adafruit_BME280 bme; // I2C
 
 unsigned long delayTime;
+
+
+CheapStepper stepper (12,13,14,15);
+
+boolean moveClockwise = true;
 
 
 void setup() {
@@ -41,6 +49,27 @@ void setup() {
 
     // suggested rate is 1/60Hz (1m)
     delayTime = 60000; // in milliseconds
+
+
+    stepper.setRpm(10);
+
+    Serial.println();
+    Serial.print(stepper.getRpm()); // get the RPM of the stepper
+    Serial.print(" rpm = delay of ");
+    Serial.print(stepper.getDelay()); // get delay between steps for set RPM
+    Serial.print(" microseconds between steps");
+    Serial.println();
+
+    delay(1000);
+
+    moveClockwise = false;
+
+    // and move back to the start position (0 degree)
+
+    stepper.moveToDegree (moveClockwise, 0);
+    delay(1000);
+
+
 
 }
 
@@ -69,9 +98,30 @@ void printValues() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-    bme.takeForcedMeasurement(); // has no effect in normal mode
+//    bme.takeForcedMeasurement(); // has no effect in normal mode
+//
+//    printValues();
+//    delay(delayTime);
 
-    printValues();
-    delay(delayTime);
+    //====================
+    moveClockwise = true;
+
+    // let's move the stepper clockwise to position 2048
+    // which is 180 degrees, a half-turn (if using default of 4096 total steps)
+
+    stepper.step (true);
+//    stepper.moveTo (moveClockwise, 2048);
+
+//    delay(2000); // wait a sec
+//
+//    // and now let's move another 90 degrees (a quarter-turn) clockwise
+//
+//    stepper.moveDegrees (moveClockwise, 90);
+//
+//    delay(2000);
+//
+//    moveClockwise = false;
+//
+//    stepper.moveToDegree(moveClockwise, 0);
 
 }
